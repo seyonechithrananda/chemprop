@@ -106,9 +106,14 @@ def evaluate(model: MoleculeModel,
         scaler=scaler
     )
 
+    transformer = dc.trans.LogTransformer(transform_y=True)
+    preds = dc.trans.undo_transforms(preds, [transformer])
+    targets = dc.trans.undo_transformers(data_loader.targets, [transformer])
+
     results = evaluate_predictions(
         preds=preds,
-        targets=data_loader.targets,
+        #targets=data_loader.targets,
+        targets = targets,
         num_tasks=num_tasks,
         metrics=metrics,
         dataset_type=dataset_type,
