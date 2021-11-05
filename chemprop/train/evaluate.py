@@ -107,9 +107,9 @@ def evaluate(model: MoleculeModel,
         scaler=scaler
     )
 
-    transformer = dc.trans.LogTransformer(transform_y=True)
+    transformer = dc.trans.NormalizationTransformer(transform_y=True)
     preds = dc.trans.undo_transforms(preds, [transformer])
-    targets = dc.trans.undo_transformers(data_loader.targets, [transformer])
+    targets = dc.trans.undo_transforms(data_loader.targets, [transformer])
 
     results = evaluate_predictions(
         preds=preds,
