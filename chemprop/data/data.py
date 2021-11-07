@@ -492,9 +492,10 @@ class MoleculeDataset(Dataset):
         """
         targets = [d.raw_targets for d in self._data]
         scaler = StandardScaler().fit(targets)
-        scaled_targets = scaler.transform(targets).tolist()
-        self.set_targets(scaled_targets)
-
+        #scaled_targets = scaler.transform(targets).tolist()
+        #self.set_targets(scaled_targets)
+        self.set_targets(targets)
+        
         return scaler
 
     def set_targets(self, targets: List[List[Optional[float]]]) -> None:
