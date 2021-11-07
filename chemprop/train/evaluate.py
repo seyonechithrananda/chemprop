@@ -93,7 +93,6 @@ def evaluate(model: MoleculeModel,
              logger: logging.Logger = None) -> Dict[str, List[float]]:
     """
     Evaluates an ensemble of models on a dataset by making predictions and then evaluating the predictions.
-
     :param model: A :class:`~chemprop.models.model.MoleculeModel`.
     :param data_loader: A :class:`~chemprop.data.data.MoleculeDataLoader`.
     :param num_tasks: Number of tasks.
@@ -102,42 +101,16 @@ def evaluate(model: MoleculeModel,
     :param scaler: A :class:`~chemprop.features.scaler.StandardScaler` object fit on the training targets.
     :param logger: A logger to record output.
     :return: A dictionary mapping each metric in :code:`metrics` to a list of values for each task.
-
     """
     preds = predict(
         model=model,
         data_loader=data_loader,
-        scaler=None
+        scaler=scaler
     )
 
-    tasks, (train_set, valid_set, test_set), transformers = load_clearance()
-    #transformer = dc.trans.NormalizationTransformer(transform_y=True)
-
-    _ = transformers[0].transform(train_set)
-    _ = transformers[0].transform(valid_set)
-    _ = transformers[0].transform(test_set)
-
-    preds_np=numpy.array([numpy.array(xi) for xi in preds])
-    labels_np=numpy.array([numpy.array(xi) for xi in data_loader.targets])
-    #dc.trans.NormalizationTransformer, transform_y=True)
-    
-    preds = dc.trans.undo_transforms(preds_np, transformers)
-    targets = dc.trans.undo_transforms(labels_np, transformers)
-
-    metrics = {
-      "rmse": mean_squared_error(y_true=targets, y_pred=preds, squared=False),
-
-    }
-
-    print(metrics)
-
-    return metrics
-
-    """
     results = evaluate_predictions(
         preds=preds,
-        #targets=data_loader.targets,
-        targets = targets,
+        targets=data_loader.targets,
         num_tasks=num_tasks,
         metrics=metrics,
         dataset_type=dataset_type,
@@ -145,4 +118,3 @@ def evaluate(model: MoleculeModel,
     )
 
     return results
-    """
