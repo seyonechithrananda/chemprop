@@ -296,20 +296,33 @@ def run_training(args: TrainArgs,
         info(f'Model {model_idx} best validation {args.metric} = {best_score:.6f} on epoch {best_epoch}')
         model = load_checkpoint(os.path.join(save_dir, MODEL_FILE_NAME), device=args.device, logger=logger)
 
-        test_preds = predict(
-            model=model,
-            data_loader=test_data_loader,
-            scaler=scaler
-        )
-        test_scores = evaluate_predictions(
-            preds=test_preds,
-            targets=test_targets,
-            num_tasks=args.num_tasks,
-            metrics=args.metrics,
-            dataset_type=args.dataset_type,
-            logger=logger
+        #test_preds = predict(
+        #    model=model,
+        #    data_loader=test_data_loader,
+        #    scaler=scaler
+        #)
+
+        test_scores = evaluate(
+                model=model,
+                data_loader=test_data_loader,
+                num_tasks=args.num_tasks,
+                metrics=args.metrics,
+                dataset_type=args.dataset_type,
+                scaler=scaler,
+                logger=logger
         )
 
+
+        #test_scores = evaluate_predictions(
+        #    preds=test_preds,
+        #    targets=test_targets,
+        #    num_tasks=args.num_tasks,
+        #    metrics=args.metrics,
+        #    dataset_type=args.dataset_type,
+        #    logger=logger
+        #)
+
+        """
         if len(test_preds) != 0:
             sum_test_preds += np.array(test_preds)
 
@@ -362,3 +375,5 @@ def run_training(args: TrainArgs,
         test_preds_dataframe.to_csv(os.path.join(args.save_dir, 'test_preds.csv'), index=False)
 
     return ensemble_scores
+    """
+    return test_scores
