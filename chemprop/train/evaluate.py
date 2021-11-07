@@ -7,7 +7,10 @@ from chemprop.data import MoleculeDataLoader, StandardScaler
 from chemprop.models import MoleculeModel
 from chemprop.utils import get_metric_func
 import deepchem as dc
+from deepchem.molnet import load_clearance
+import numpy
 
+from sklearn.metrics import mean_squared_error
 
 def evaluate_predictions(preds: List[List[float]],
                          targets: List[List[float]],
@@ -104,13 +107,33 @@ def evaluate(model: MoleculeModel,
     preds = predict(
         model=model,
         data_loader=data_loader,
-        scaler=scaler
+        scaler=None
     )
 
-    transformer = dc.trans.NormalizationTransformer(transform_y=True)
-    preds = dc.trans.undo_transforms(preds, [transformer])
-    targets = dc.trans.undo_transforms(data_loader.targets, [transformer])
+    tasks, (train_set, valid_set, test_set), transformers = load_clearance()
+    #transformer = dc.trans.NormalizationTransformer(transform_y=True)
 
+    _ = transformers[0].transform(train_set)
+    _ = transformers[0].transform(valid_set)
+    _ = transformers[0].transform(test_set)
+
+    preds_np=numpy.array([numpy.array(xi) for xi in preds])
+    labels_np=numpy.array([numpy.array(xi) for xi in data_loader.targets])
+    #dc.trans.NormalizationTransformer, transform_y=True)
+    
+    preds = dc.trans.undo_transforms(preds_np, transformers)
+    targets = dc.trans.undo_transforms(labels_np, transformers)
+
+    metrics = {
+      "rmse": mean_squared_error(y_true=targets, y_pred=preds, squared=False),
+
+    }
+
+    print(metrics)
+
+    return metrics
+
+    """
     results = evaluate_predictions(
         preds=preds,
         #targets=data_loader.targets,
@@ -122,3 +145,4 @@ def evaluate(model: MoleculeModel,
     )
 
     return results
+    """
